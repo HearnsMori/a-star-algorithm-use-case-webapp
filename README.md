@@ -9,7 +9,7 @@ This project demonstrates an **A*** pathfinding algorithm with:
 ## Project Structure
 ```
 root/
-front/   # Next.js frontend (React + Framer Motion)
+webfront/   # Next.js frontend (React + Framer Motion)
 back/    # FastAPI backend (Python)
 ```
 
@@ -42,8 +42,8 @@ Run the FastAPI server:
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-- API will be available at: [http://127.0.0.1:8000](http://127.0.0.1:8000)  
-- Docs available at: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+- API will be available at: [http://127.0.0.1:8000](http://127.0.0.1:8000/star)  
+- Small Info available at: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/)
 
 ---
 
