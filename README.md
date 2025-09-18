@@ -42,8 +42,8 @@ Run the FastAPI server:
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-- API will be available at: [http://127.0.0.1:8000](http://127.0.0.1:8000/star)  
-- Small Info available at: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/)
+- API will be available at: [http://127.0.0.1:8000/astar](http://127.0.0.1:8000/astar)  
+- Small Info available at: [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
 
 ---
 
