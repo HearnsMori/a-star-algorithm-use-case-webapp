@@ -41,11 +41,12 @@ def read_root():
 @app.post("/astar/")
 def calculate_path_api(request: PathRequest):
     """
-    Calculates the shortest path using the A* algorithm based on the provided JSON data.
+    Calculates the shortest path using the
+	A* algorithm based on the provided JSON data.
     """
-    solution = astar.calculate_path(
+    solution = astar.find_path(
         start_node=request.start_node.dict(),
         goal_node=request.goal_node.dict(),
-        available_paths=request.available_path
+        edges=request.available_path
     )
     return {"Movement": solution}

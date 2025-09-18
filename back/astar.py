@@ -1,100 +1,94 @@
 import heapq
 
-class Node:
-    # A simplified Node class for A*
+class AStarNode:
+    #Node class for A star
     def __init__(self, parent=None, position=None):
         self.parent = parent
         self.position = position
-        self.g = 0
-        self.h = 0
-        self.f = 0
+        self.g_cost = 0  # Cost from start
+        self.h_cost = 0  # Heuristic cost
+        self.f_cost = 0  # Total cost
     
     def __eq__(self, other):
         return self.position == other.position
     
     def __lt__(self, other):
-        return self.f < other.f
+        return self.f_cost < other.f_cost
 
-def build_graph(available_paths: list):
+
+def init_graph(edges: list):
     """
-    Builds an adjacency list representation of a graph from available paths.
+    Convert list of edges into an
+    adjacency list representation.
     """
-    graph = {}
+    adjacency = {}
     
-    for path in available_paths:
-        # CORRECT: Use dot notation to access attributes
-        start_node = (path.x1, path.y1)
-        end_node = (path.x2, path.y2)
+    for edge in edges:
+        start = (edge.x1, edge.y1)
+        end = (edge.x2, edge.y2)
         
-        if start_node not in graph:
-            graph[start_node] = []
-        if end_node not in graph:
-            graph[end_node] = []
-        
-        graph[start_node].append(end_node)
-        graph[end_node].append(start_node)
+        adjacency.setdefault(start, []).append(end)
+        adjacency.setdefault(end, []).append(start)
     
-    return graph
+    return adjacency
 
-def astar_search(graph, start, end):
-    # A* search algorithm implementation
-    start_node = Node(None, start)
-    end_node = Node(None, end)
-    
-    # ... (the rest of the astar_search function remains the same) ...
 
-    open_list = []
-    closed_list = set()
+def astar(adjacency, start, goal):
+    """
+    A* search algorithm
+    implementation.
+    """
+    start_node = AStarNode(None, start)
+    goal_node = AStarNode(None, goal)
 
-    heapq.heappush(open_list, (start_node.f, start_node))
+    open_heap = []
+    closed_set = set()
 
-    while open_list:
-        f_val, current_node = heapq.heappop(open_list)
-        closed_list.add(current_node.position)
+    heapq.heappush(open_heap, (start_node.f_cost, start_node))
 
-        if current_node.position == end_node.position:
+    while open_heap:
+        _, current = heapq.heappop(open_heap)
+        closed_set.add(current.position)
+
+        if current.position == goal_node.position:
             path = []
-            current = current_node
-            while current is not None:
+            while current:
                 path.append(current.position)
                 current = current.parent
             return path[::-1]
 
-        neighbors = graph.get(current_node.position, [])
-
-        for neighbor_pos in neighbors:
-            if neighbor_pos in closed_list:
+        for neighbor_pos in adjacency.get(current.position, []):
+            if neighbor_pos in closed_set:
                 continue
-            
-            new_node = Node(current_node, neighbor_pos)
-            
-            new_node.g = current_node.g + 1
-            new_node.h = abs(new_node.position[0] - end_node.position[0]) + \
-                         abs(new_node.position[1] - end_node.position[1])
-            new_node.f = new_node.g + new_node.h
-            
-            in_open = any(open_node.position == new_node.position and open_node.g <= new_node.g for _, open_node in open_list)
-            
+
+            neighbor = AStarNode(current, neighbor_pos)
+            neighbor.g_cost = current.g_cost + 1
+            neighbor.h_cost = abs(neighbor.position[0] - goal_node.position[0]) + \
+                              abs(neighbor.position[1] - goal_node.position[1])
+            neighbor.f_cost = neighbor.g_cost + neighbor.h_cost
+
+            in_open = any(n.position == neighbor.position and n.g_cost <= neighbor.g_cost
+                          for _, n in open_heap)
+
             if not in_open:
-                heapq.heappush(open_list, (new_node.f, new_node))
+                heapq.heappush(open_heap, (neighbor.f_cost, neighbor))
 
     return None
 
-def calculate_path(start_node: dict, goal_node: dict, available_paths: list):
+
+def find_path(start_node: dict, goal_node: dict, edges: list):
     """
-    Calculates the shortest path using A* on a predefined graph.
+    Wrapper function to compute the
+    shortest path using A*.
     """
-    graph = build_graph(available_paths)
+    adjacency = init_graph(edges)
 
     start = (start_node['x'], start_node['y'])
-    end = (goal_node['x'], goal_node['y'])
+    goal = (goal_node['x'], goal_node['y'])
     
-    if start not in graph or end not in graph:
-        return {"error": "Start or goal node is not a part of the available paths."}
+    if start not in adjacency or goal not in adjacency:
+        return {"error": "Start or goal node is not part of the graph."}
 
-    path = astar_search(graph, start, end)
+    path = astar(adjacency, start, goal)
 
-    if path:
-        return path
-    else:
-        return {"error": "No path found between the nodes."}
+    return path if path else {"error": "No path found between the nodes."}
